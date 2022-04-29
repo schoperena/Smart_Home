@@ -1,5 +1,10 @@
-// Version 0.2
+/* 
+Smart Home
+Version 2: Se añaden sensores pir y funcion de alarma
+Sebastian choperena Solano
+*/
 
+#include <EasyBuzzer.h>
 #include <WiFi.h>
 
 const char* ssid= "CH-Home"; 
@@ -13,11 +18,19 @@ String ESTADO_DISP2 = "off";
 String ESTADO_DISP3 = "off";
 String ESTADO_DISP4 = "off";
 
+//Relays
+const byte PIN_DISP1 = 14;
+const byte PIN_DISP2 = 27;
+const byte PIN_DISP3 = 26;
+const byte PIN_DISP4 = 25;
 
-const int PIN_DISP1 = 14;
-const int PIN_DISP2 = 27;
-const int PIN_DISP3 = 26;
-const int PIN_DISP4 = 25;
+//Sensores - pines por definir
+const byte PIN_SENS1 = 0;
+const byte PIN_SENS2 = 0;
+
+bool armado = false;
+
+const byte PIN_BUZZ1 = 0;
 
 
 void setup() {
@@ -26,12 +39,17 @@ void setup() {
   pinMode(PIN_DISP2, OUTPUT);
   pinMode(PIN_DISP3, OUTPUT);
   pinMode(PIN_DISP4, OUTPUT);
-
+  /* La logica del modulo de relay está inverso,
+  para que inicie en off se debe poner en HIGH en el inicio*/
   digitalWrite(PIN_DISP1, HIGH);
   digitalWrite(PIN_DISP2, HIGH);
   digitalWrite(PIN_DISP3, HIGH);
   digitalWrite(PIN_DISP4, HIGH);
 
+  pinMode(PIN_SENS1, INPUT);
+  pinMode(PIN_SENS2, INPUT);
+
+  EasyBuzzer.setPin(PIN_BUZZ1);
 
   Serial.print("conectando a ");
   Serial.println(ssid);
@@ -57,45 +75,36 @@ void loop(){
         char new_byte = client.read();             
         Serial.write(new_byte);                    
         header += new_byte;
-        if (new_byte == '\n') {                    
-         
+        if (new_byte == '\n') {
           if (current_data_line.length() == 0){
-            
             client.println("HTTP/1.1 200 OK");
             client.println("Content-type:text/html");
             client.println("Conexion: cerrada");
             client.println();
-            
+            //Dispositivo 1
             if (header.indexOf("DISP1=ON") != -1){
-              
               Serial.println("DISP1  ON");
               ESTADO_DISP1 = "on";
               digitalWrite(PIN_DISP1, LOW);
             } 
             if (header.indexOf("DISP1=OFF") != -1){
-              
               Serial.println("DISP1  OFF");
               ESTADO_DISP1 = "off";
               digitalWrite(PIN_DISP1, HIGH);
             } 
-
-            
+            //Dispositivo 2
             if (header.indexOf("DISP2=ON") != -1){
-              
               Serial.println("DISP2  ON");
               ESTADO_DISP2 = "on";
               digitalWrite(PIN_DISP2, LOW);
             }
             if (header.indexOf("DISP2=OFF") != -1){
-              
               Serial.println("DISP2  OFF");
               ESTADO_DISP2 = "off";
               digitalWrite(PIN_DISP2, HIGH);
             }
-
-            
+            //Dispositivo 3            
             if (header.indexOf("DISP3=ON") != -1){
-              
               Serial.println("DISP3  ON");
               ESTADO_DISP3 = "on";
               digitalWrite(PIN_DISP3, LOW);
@@ -105,10 +114,8 @@ void loop(){
               ESTADO_DISP3 = "off";
               digitalWrite(PIN_DISP3, HIGH);
             }
-
-
+            //Dispositivo 4
             if (header.indexOf("DISP4=ON") != -1){
-              
               Serial.println("DISP4  ON");
               ESTADO_DISP4 = "on";
               digitalWrite(PIN_DISP4, LOW);
@@ -118,6 +125,15 @@ void loop(){
               ESTADO_DISP4 = "off";
               digitalWrite(PIN_DISP4, HIGH);
             }
+            //armado
+            if (header.indexOf("ARM=ON") != -1){
+              Serial.println("ARMADO  ON");
+              armado = true;
+            }
+            if(header.indexOf("ARM=OFF") != -1) {
+              Serial.println("ARMADO  OFF");
+              armado = false;
+            }
 
             //HTML
             client.println("<!DOCTYPE html><html>");
@@ -125,8 +141,7 @@ void loop(){
             client.println("<link rel=\"icon\" href=\"data:,\">");
             client.println("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}");
             client.println(".button { background-color: #4CAF50; border: 2px solid #4CAF50;; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; }");
-            client.println("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}");            
-            // HEAD DE LA WEB
+            client.println("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}");
             client.println("</style></head>");
             client.println("<body><center><h1>SMART HOME</h1></center>");
             client.println("<center><h2>WEB SERVER VERSION V0.2</h2></center>" );
@@ -165,4 +180,13 @@ void loop(){
     Serial.println("Cliente Desconectado.");
     Serial.println("");
   }
+  
+  //verificar armado
+  if (armado == true){
+    if (digitalRead(PIN_SENS1) == HIGH or digitalRead(PIN_SENS2) == HIGH){
+      // EasyBuzzer.beep(frecuencia, duracionOn, duracionOff, beeps, duracionPausa, secuencia);
+      EasyBuzzer.beep(2000, 100,100, 2, 300, 1);
+    }
+  }
+
 }
