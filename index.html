@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">
+    <link rel=\"icon\" href=\"data:,\">
+    <style>
+        html {
+            font-family: Helvetica;
+            display: inline-block;
+            margin: 0px auto;
+            text-align: center;
+        }
+
+        .button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 16px 40px;
+            text-decoration: none;
+            font-size: 30px;
+            margin: 2px;
+            cursor: pointer;
+        }
+
+        .button2 {
+            background-color: #555555;
+        }
+    </style>
+</head>
+
+<body>
+    <center>
+        <h1>SMART HOME</h1>
+    </center>
+    <center>
+        <h2>WEB SERVER VERSION V0.2</h2>
+    </center>
+    <form>
+        <center>
+            <p>estado de DISP1: " + ESTADO_DISP1 + "</p>
+            <center> <button class=\"button\" name=\"DISP1\" value=\"ON\" type=\"submit\">DISP1 ON</button>
+                <button class=\"button\" name=\"DISP1\" value=\"OFF\" type=\"submit\">DISP1 OFF</button><br><br>
+                <p>estado de DISP2: " + ESTADO_DISP2 + "</p>
+                <button class=\"button\" name=\"DISP2\" value=\"ON\" type=\"submit\">DISP2 ON</button>
+                <button class=\"button\" name=\"DISP2\" value=\"OFF\" type=\"submit\">DISP2 OFF</button> <br><br>
+                <p>estado de DISP3: " + ESTADO_DISP3 + "</p>
+                <button class=\"button\" name=\"DISP3\" value=\"ON\" type=\"submit\">DISP3 ON</button>
+                <button class=\"button\" name=\"DISP3\" value=\"OFF\" type=\"submit\">DISP3 OFF</button> <br><br>
+                <p>estado de DISP4: " + ESTADO_DISP4 + "</p>
+                <button class=\"button\" name=\"DISP4\" value=\"ON\" type=\"submit\">DISP4 ON</button>
+                <button class=\"button\" name=\"DISP4\" value=\"OFF\" type=\"submit\">DISP4 OFF</button> <br><br>
+                <p>estado de alarma: " + ESTADO_ARM + "</p>
+                <button class=\"button\" name=\"ALARMA\" value=\"ON\" type=\"submit\">ARMADO</button>
+                <button class=\"button\" name=\"ALARMA\" value=\"OFF\" type=\"submit\">DESARMADO</button> <br><br>
+            </center>
+    </form>
+</body>
+
+</html>
