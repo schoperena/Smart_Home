@@ -4,38 +4,39 @@ Version 2: Se añaden sensores pir y funcion de alarma
 Sebastian choperena Solano
 */
 
-#include <EasyBuzzer.h>
-#include <WiFi.h>
-
-const char *ssid = "CH-Home";
-const char *password = "hi5-L7-U06Zl0fPf";
+// Librerias necesrias para el funcionamientos del codigo
+#include <EasyBuzzer.h> //Libreria para usar buzzer
+#include <WiFi.h>       // Librerias para usar las funcionalidades wifi del modulo
+// Variables datos wifi
+const char *ssid = "nombre_red";
+const char *password = "contraseña";
+// Puerto del servidor web
 WiFiServer server(80);
-
+// Variable relacionada con las pagina web
 String header;
-
+// Variable de estado de los dispositivos
 String ESTADO_DISP1 = "off";
 String ESTADO_DISP2 = "off";
 String ESTADO_DISP3 = "off";
 String ESTADO_DISP4 = "off";
 String ESTADO_ARM = "off";
-
-// Relays
+// Varibales que guardan los pines de los Relays
 const byte PIN_DISP1 = 14;
 const byte PIN_DISP2 = 27;
 const byte PIN_DISP3 = 26;
 const byte PIN_DISP4 = 25;
-
-// Sensores - pines por definir
-const byte PIN_SENS1 = 0;
-const byte PIN_SENS2 = 0;
-
+// Variables que guardan los pines de los sensores
+const byte PIN_SENS1 = 16;
+const byte PIN_SENS2 = 17;
+// Variable que guarda el estado de armado de la alarma(true - false)(verdadero - falso)
 bool armado = false;
-
+// Varibale que guarda el pin del buzzer
 const byte PIN_BUZZ1 = 0;
 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(115200); // Iniciamos la comunicacion serial
+  // Configuramos los pines de los relay como salidas
   pinMode(PIN_DISP1, OUTPUT);
   pinMode(PIN_DISP2, OUTPUT);
   pinMode(PIN_DISP3, OUTPUT);
@@ -46,14 +47,15 @@ void setup()
   digitalWrite(PIN_DISP2, HIGH);
   digitalWrite(PIN_DISP3, HIGH);
   digitalWrite(PIN_DISP4, HIGH);
-  // Configuracion pin sensores como entradas
+  // Configuracion pines de los sensores como entradas
   pinMode(PIN_SENS1, INPUT);
   pinMode(PIN_SENS2, INPUT);
-
+  // Definimos el pin del buzzer, usando el metodo de la libreria
   EasyBuzzer.setPin(PIN_BUZZ1);
-
+  // Imprime que se esta conectando a: nombre_red
   Serial.print("conectando a ");
   Serial.println(ssid);
+  // Inicia la conexion a la red wifi
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED)
   {
@@ -62,6 +64,7 @@ void setup()
   }
   Serial.println("");
   Serial.println("Conexion establecida");
+  // Imprime la direccion IP asignada
   Serial.println("Direccion IP: ");
   Serial.println(WiFi.localIP());
   server.begin();
@@ -69,6 +72,7 @@ void setup()
 
 void loop()
 {
+  // Comprueba si un cliente se conecta al servidor
   WiFiClient client = server.available();
   if (client)
   {
@@ -154,8 +158,7 @@ void loop()
               armado = false;
               ESTADO_ARM = "off";
             }
-
-            // HTML
+            // HTML - Pagina web
             client.println("<!DOCTYPE html><html>");
             client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
             client.println("<link rel=\"icon\" href=\"data:,\">");
@@ -211,7 +214,7 @@ void loop()
   {
     if (digitalRead(PIN_SENS1) == HIGH || digitalRead(PIN_SENS2) == HIGH)
     {
-      //frecuencia, duracionOn, duracionOff, beeps, duracionPausa, secuencia
+      // frecuencia, duracionOn, duracionOff, beeps, duracionPausa, secuencia
       EasyBuzzer.beep(2000, 100, 100, 2, 300, 1);
     }
   }
