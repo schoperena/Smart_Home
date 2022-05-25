@@ -23,15 +23,15 @@ String ESTADO_ARM = "off";
 // Varibales que guardan los pines de los Relays
 const byte PIN_DISP1 = 14;
 const byte PIN_DISP2 = 27;
-const byte PIN_DISP3 = 26;
+const byte PIN_DISP3 = 33;
 const byte PIN_DISP4 = 25;
 // Variables que guardan los pines de los sensores
-const byte PIN_SENS1 = 16;
+const byte PIN_SENS1 = 26;
 const byte PIN_SENS2 = 17;
 // Variable que guarda el estado de armado de la alarma(true - false)(verdadero - falso)
 bool armado = false;
 // Varibale que guarda el pin del buzzer
-const byte PIN_BUZZ1 = 0;
+const byte PIN_BUZZ1 = 32;
 
 void setup()
 {
@@ -43,10 +43,10 @@ void setup()
   pinMode(PIN_DISP4, OUTPUT);
   /* La logica del modulo de relay está inverso,
   para que inicie en off se debe poner en HIGH en el inicio*/
-  digitalWrite(PIN_DISP1, HIGH);
-  digitalWrite(PIN_DISP2, HIGH);
-  digitalWrite(PIN_DISP3, HIGH);
-  digitalWrite(PIN_DISP4, HIGH);
+  digitalWrite(PIN_DISP1, LOW);
+  digitalWrite(PIN_DISP2, LOW);
+  digitalWrite(PIN_DISP3, LOW);
+  digitalWrite(PIN_DISP4, LOW);
   // Configuracion pines de los sensores como entradas
   pinMode(PIN_SENS1, INPUT);
   pinMode(PIN_SENS2, INPUT);
@@ -72,6 +72,8 @@ void setup()
 
 void loop()
 {
+  // Este metodo debe ser llamado en loop para que funcione la libreria
+  EasyBuzzer.update();
   // Comprueba si un cliente se conecta al servidor
   WiFiClient client = server.available();
   if (client)
@@ -98,52 +100,52 @@ void loop()
             {
               Serial.println("DISP1  ON");
               ESTADO_DISP1 = "on";
-              digitalWrite(PIN_DISP1, LOW);
+              digitalWrite(PIN_DISP1, HIGH);
             }
             if (header.indexOf("DISP1=OFF") != -1)
             {
               Serial.println("DISP1  OFF");
               ESTADO_DISP1 = "off";
-              digitalWrite(PIN_DISP1, HIGH);
+              digitalWrite(PIN_DISP1, LOW);
             }
             // Dispositivo 2
             if (header.indexOf("DISP2=ON") != -1)
             {
               Serial.println("DISP2  ON");
               ESTADO_DISP2 = "on";
-              digitalWrite(PIN_DISP2, LOW);
+              digitalWrite(PIN_DISP2, HIGH);
             }
             if (header.indexOf("DISP2=OFF") != -1)
             {
               Serial.println("DISP2  OFF");
               ESTADO_DISP2 = "off";
-              digitalWrite(PIN_DISP2, HIGH);
+              digitalWrite(PIN_DISP2, LOW);
             }
             // Dispositivo 3
             if (header.indexOf("DISP3=ON") != -1)
             {
               Serial.println("DISP3  ON");
               ESTADO_DISP3 = "on";
-              digitalWrite(PIN_DISP3, LOW);
+              digitalWrite(PIN_DISP3, HIGH);
             }
             if (header.indexOf("DISP3=OFF") != -1)
             {
               Serial.println("DISP3  OFF");
               ESTADO_DISP3 = "off";
-              digitalWrite(PIN_DISP3, HIGH);
+              digitalWrite(PIN_DISP3, LOW);
             }
             // Dispositivo 4
             if (header.indexOf("DISP4=ON") != -1)
             {
               Serial.println("DISP4  ON");
               ESTADO_DISP4 = "on";
-              digitalWrite(PIN_DISP4, LOW);
+              digitalWrite(PIN_DISP4, HIGH);
             }
             if (header.indexOf("DISP4=OFF") != -1)
             {
               Serial.println("DISP4  OFF");
               ESTADO_DISP4 = "off";
-              digitalWrite(PIN_DISP4, HIGH);
+              digitalWrite(PIN_DISP4, LOW);
             }
             // Armado alarma
             if (header.indexOf("ARM=ON") != -1)
@@ -201,21 +203,22 @@ void loop()
         }
       }
     }
-
+    // Se resetea la variable header
     header = "";
     // Cierra la conexion
     client.stop();
     Serial.println("Cliente Desconectado.");
     Serial.println("");
   }
-
   // verificar armado
   if (armado == true)
   {
-    if (digitalRead(PIN_SENS1) == HIGH || digitalRead(PIN_SENS2) == HIGH)
+    // Verifica que el sensor detecta movimiento
+    if (digitalRead(PIN_SENS1) == HIGH)
     {
+      // Hace Sonar el buzzer
       // frecuencia, duracionOn, duracionOff, beeps, duracionPausa, secuencia
-      EasyBuzzer.beep(2000, 100, 100, 2, 300, 1);
+      EasyBuzzer.beep(2000, 200, 200, 4, 100, 1);
     }
   }
 }
